@@ -1,0 +1,68 @@
+services:
+  db:
+    image: postgres
+    expose:
+      - "5432"
+    networks:
+      - djangonetwork
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pw1234
+      POSTGRES_DB: moviegeeks
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    restart: always
+    build: .
+    command: python manage.py runserver 0.0.0.0:8010
+    volumes:
+      - .:/code
+    ports:
+      - "8010:8010"
+    networks:
+      - djangonetwork
+    depends_on:
+      - db
+
+  build-recs:
+    build: .
+    command: python -m builder.bpr_calculator
+    networks:
+      - djangonetwork  # Added network for consistency
+
+  evaluate:
+    restart: always
+    build: .
+    command: python -m evaluator.evaluation_runner -ltr
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+    networks:
+      - djangonetwork  # Added network for consistency
+
+  notebook:
+    build: .
+    command: jupyter notebook --ip=0.0.0.0 --no-browser --allow-root  # Added options for Jupyter
+    ports:
+      - "8888:8888"
+    networks:
+      - djangonetwork  # Added network for consistency
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "8080:80"
+    networks:
+      - djangonetwork  # Added network for consistency
+
+networks:
+  djangonetwork:
+    driver: bridge
+
+volumes:
+  pgdata:
