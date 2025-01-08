@@ -1,8 +1,5 @@
 # The MovieGEEK Installation Guide
-
-The MovieGEEK is a website initially implemented to accompany my book, Practical Recommender Systems. 
-However, this folder is used for the manning LiveProject, which is currently in MEAP. 
- 
+  
 The website is not intended as a standalone tutorial or a plug-and-play website for you to install and 
 use for your content. 
 
